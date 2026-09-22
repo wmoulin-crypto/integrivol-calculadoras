@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IntegriVOL – Calculadoras de coste</title>
+<style>
+  :root { --green-dark:#155A26; --green-med:#22993E; --green-light:#F0FAF2; --orange:#FF7A36; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',Arial,sans-serif; background:#F9FAFB; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 16px; }
+  .brand { background:var(--green-dark); color:#fff; font-size:13px; font-weight:700;
+    padding:5px 14px; border-radius:6px; letter-spacing:0.05em; margin-bottom:24px; }
+  h1 { font-size:22px; font-weight:600; color:var(--green-dark); margin-bottom:8px; text-align:center; }
+  p { font-size:13px; color:#666; margin-bottom:32px; text-align:center; }
+  .cards { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+  .card { background:#fff; border:1px solid #E0E0E0; border-radius:12px; padding:28px 24px;
+    width:280px; text-decoration:none; color:inherit; transition:box-shadow 0.2s; }
+  .card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.10); }
+  .card .icon { font-size:36px; margin-bottom:12px; }
+  .card h2 { font-size:16px; font-weight:600; margin-bottom:8px; }
+  .card p { font-size:12px; color:#888; margin-bottom:0; text-align:left; }
+  .card.green { border-top:4px solid var(--green-dark); }
+  .card.orange { border-top:4px solid var(--orange); }
+  .card h2.green { color:var(--green-dark); }
+  .card h2.orange { color:var(--orange); }
+  footer { margin-top:40px; font-size:11px; color:#bbb; }
+</style>
+</head>
+<body>
+  <span class="brand">infarm</span>
+  <h1>Calculadoras de coste · IntegriVOL</h1>
+  <p>Selecciona la calculadora que necesitas</p>
+  <div class="cards">
+    <a class="card green" href="calculadora_integrivol.html">
+      <div class="icon">🐷</div>
+      <h2 class="green">Lechones destetados</h2>
+      <p>Calcula el coste por lechón y por lote según dosis, semanas de tratamiento y precio.</p>
+    </a>
+    <a class="card orange" href="calculadora_cerdas_integrivol.html">
+      <div class="icon">🍼</div>
+      <h2 class="orange">Cerdas · Gestación y partos</h2>
+      <p>Coste por cerda y por grupo en gestación o sala de partos, ajustando dosis y duración.</p>
+    </a>
+  </div>
+  <footer>infarmmanagement.com · IntegriVOL</footer>
+</body>
+</html>

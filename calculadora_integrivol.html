@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de coste IntegriVOL por lechón</title>
+<style>
+  :root {
+    --green-dark: #155A26;
+    --green-med: #22993E;
+    --green-light: #F0FAF2;
+    --green-cell: #C5DFCB;
+    --orange: #FF7A36;
+    --bg: #F9FAFB;
+    --surface: #FFFFFF;
+    --border: #E0E0E0;
+    --text: #1A1A1A;
+    --text-sec: #555555;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); padding: 24px 16px; min-height: 100vh; }
+  .logo-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .logo-bar h1 { font-size: 18px; font-weight: 600; color: var(--green-dark); }
+  .brand { background: var(--green-dark); color: #fff; font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 6px; letter-spacing: 0.04em; }
+  .controls { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px 32px; }
+  @media(max-width: 560px) { .controls { grid-template-columns: 1fr; } }
+  .field label { font-size: 12px; font-weight: 600; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px; }
+  .field .desc { font-size: 11px; color: #888; margin-bottom: 8px; }
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  .slider-row input[type=range] { flex: 1; accent-color: var(--green-med); height: 4px; }
+  .slider-val { font-size: 15px; font-weight: 700; color: var(--green-dark); min-width: 52px; text-align: right; }
+  .field input[type=number] { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 14px; color: var(--text); }
+  .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media(max-width: 640px) { .summary { grid-template-columns: repeat(2, 1fr); } }
+  .metric { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .metric .mlabel { font-size: 11px; color: var(--text-sec); margin-bottom: 4px; }
+  .metric .mval { font-size: 22px; font-weight: 700; color: var(--green-dark); }
+  .metric.highlight { background: var(--green-dark); border-color: var(--green-dark); }
+  .metric.highlight .mlabel { color: var(--green-cell); }
+  .metric.highlight .mval { color: #fff; }
+  .metric .msub { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
+  .metric.highlight .msub { color: var(--green-cell); }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); font-size: 13px; }
+  thead th { background: var(--green-dark); color: #fff; padding: 10px 12px; text-align: center; font-weight: 600; font-size: 12px; }
+  thead th:first-child { text-align: left; }
+  tbody tr:nth-child(odd) { background: var(--green-light); }
+  tbody tr:nth-child(even) { background: #fff; }
+  tbody td { padding: 9px 12px; text-align: center; border-bottom: 1px solid #eee; }
+  tbody td:first-child { text-align: left; font-weight: 500; color: var(--green-dark); }
+  tfoot td { background: var(--green-med); color: #fff; padding: 10px 12px; font-weight: 700; text-align: center; }
+  tfoot td:first-child { text-align: left; }
+  .tfoot-alt { background: var(--orange) !important; }
+  .note { font-size: 11px; color: #888; margin-top: 12px; text-align: center; }
+  .section-title { font-size: 13px; font-weight: 700; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .inactive-row td { color: #aaa !important; background: #F5F5F5 !important; }
+  .inactive-row td:first-child { color: #bbb !important; }
+</style>
+</head>
+<body>
+
+<div class="logo-bar">
+  <h1>Calculadora de coste · IntegriVOL</h1>
+  <span class="brand">infarm</span>
+</div>
+
+<div class="controls">
+  <div class="field">
+    <label>Dosis</label>
+    <div class="desc">Litros de IntegriVOL por 1.000 L de agua</div>
+    <div class="slider-row">
+      <input type="range" id="dosis" min="0.2" max="2.0" step="0.1" value="0.8">
+      <span class="slider-val"><span id="dosis-val">0,8</span> L/1.000L</span>
+    </div>
+  </div>
+  <div class="field">
+    <label>Semanas de tratamiento</label>
+    <div class="desc">Número de semanas activas (máx. 6)</div>
+    <div class="slider-row">
+      <input type="range" id="semanas" min="1" max="6" step="1" value="6">
+      <span class="slider-val"><span id="semanas-val">6</span> sem.</span>
+    </div>
+  </div>
+  <div class="field">
+    <label>Precio IntegriVOL</label>
+    <div class="desc">€ por litro</div>
+    <div class="slider-row">
+      <input type="range" id="precio" min="50" max="200" step="5" value="100">
+      <span class="slider-val"><span id="precio-val">100</span> €/L</span>
+    </div>
+  </div>
+  <div class="field">
+    <label>Número de lechones</label>
+    <div class="desc">Tamaño del lote para calcular coste total</div>
+    <div class="slider-row">
+      <input type="range" id="lechones" min="100" max="5000" step="50" value="1000">
+      <span class="slider-val"><span id="lechones-val">1.000</span></span>
+    </div>
+  </div>
+</div>
+
+<div class="summary" id="summary"></div>
+
+<p class="section-title">Desglose semanal</p>
+<table id="tabla">
+  <thead>
+    <tr>
+      <th>Período</th>
+      <th>L agua / lechón / sem.</th>
+      <th>mL IntegriVOL / lechón</th>
+      <th>Coste / lechón</th>
+      <th>Coste lote</th>
+    </tr>
+  </thead>
+  <tbody id="tabla-body"></tbody>
+  <tfoot id="tabla-foot"></tfoot>
+</table>
+
+<p class="note">Consumo de agua basado en Apporsafe / García-Manzanilla y Gasa (2006) · Dosis estándar recomendada: 0,8 L/1.000 L agua</p>
+
+<script>
+const SEMANAS = [
+  { label: 'Días 1–3 (entrada)', aguaDia: 0.35, dias: 3 },
+  { label: 'Semana 1', aguaDia: 0.50, dias: 7 },
+  { label: 'Semana 2', aguaDia: 1.00, dias: 7 },
+  { label: 'Semana 3', aguaDia: 1.50, dias: 7 },
+  { label: 'Semana 4', aguaDia: 2.00, dias: 7 },
+  { label: 'Semana 5', aguaDia: 2.25, dias: 7 },
+  { label: 'Semana 6', aguaDia: 2.50, dias: 7 },
+];
+
+function fmt(n, dec=4) { return n.toFixed(dec).replace('.', ','); }
+function fmtE(n) {
+  return n.toLocaleString('es-ES', { minimumFractionDigits: 4, maximumFractionDigits: 4 }) + ' €';
+}
+function fmtE2(n) {
+  return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+function fmtN(n) {
+  return n.toLocaleString('es-ES');
+}
+
+function calc() {
+  const dosis = parseFloat(document.getElementById('dosis').value);
+  const precio = parseFloat(document.getElementById('precio').value);
+  const semanasActivas = parseInt(document.getElementById('semanas').value);
+  const lechones = parseInt(document.getElementById('lechones').value);
+
+  // dosis: L IntegriVOL por 1000 L agua → ratio = dosis/1000
+  const ratio = dosis / 1000;
+
+  let totalAguaLechon = 0;
+  let totalMlLechon = 0;
+  let totalCosteLechon = 0;
+
+  // semanas activas: siempre incluye "días 1-3" + semanas 1..N-1
+  // índice 0 = días 1-3, índice 1 = semana 1, ..., índice 6 = semana 6
+  // semanasActivas=1 → solo días 1-3
+  // semanasActivas=2 → días 1-3 + semana 1
+  // etc.
+
+  const rows = [];
+  for (let i = 0; i < SEMANAS.length; i++) {
+    const s = SEMANAS[i];
+    const active = i < semanasActivas;
+    const aguaSem = s.aguaDia * s.dias;
+    const mlSem = aguaSem * ratio * 1000;
+    const costeLechon = aguaSem * ratio * precio;
+    const costeLote = costeLechon * lechones;
+
+    if (active) {
+      totalAguaLechon += aguaSem;
+      totalMlLechon += mlSem;
+      totalCosteLechon += costeLechon;
+    }
+
+    rows.push({ label: s.label, aguaSem, mlSem, costeLechon, costeLote, active });
+  }
+
+  const totalCosteLote = totalCosteLechon * lechones;
+
+  // Render summary
+  const summary = document.getElementById('summary');
+  summary.innerHTML = `
+    <div class="metric">
+      <div class="mlabel">Agua total por lechón</div>
+      <div class="mval">${fmt(totalAguaLechon, 1)} L</div>
+      <div class="msub">${semanasActivas} período${semanasActivas>1?'s':''} activos</div>
+    </div>
+    <div class="metric">
+      <div class="mlabel">IntegriVOL por lechón</div>
+      <div class="mval">${fmt(totalMlLechon, 1)} mL</div>
+      <div class="msub">= ${fmt(totalMlLechon/1000, 4)} L</div>
+    </div>
+    <div class="metric highlight">
+      <div class="mlabel">Coste por lechón</div>
+      <div class="mval">${fmtE(totalCosteLechon)}</div>
+      <div class="msub">Dosis ${fmt(dosis,1).replace('.',',')} L/1.000L · ${precio} €/L</div>
+    </div>
+    <div class="metric highlight">
+      <div class="mlabel">Coste lote (${fmtN(lechones)} lechones)</div>
+      <div class="mval">${fmtE2(totalCosteLote)}</div>
+      <div class="msub">Total tratamiento</div>
+    </div>
+  `;
+
+  // Render table
+  const tbody = document.getElementById('tabla-body');
+  tbody.innerHTML = rows.map(r => `
+    <tr class="${r.active ? '' : 'inactive-row'}">
+      <td>${r.label}${r.active ? '' : ' <span style="font-size:10px;color:#bbb">(no aplicado)</span>'}</td>
+      <td>${fmt(r.aguaSem, 2)}</td>
+      <td>${fmt(r.mlSem, 2)}</td>
+      <td>${r.active ? fmtE(r.costeLechon) : '—'}</td>
+      <td>${r.active ? fmtE2(r.costeLote) : '—'}</td>
+    </tr>
+  `).join('');
+
+  const tfoot = document.getElementById('tabla-foot');
+  tfoot.innerHTML = `
+    <tr>
+      <td>TOTAL (${semanasActivas} período${semanasActivas>1?'s':''})</td>
+      <td>${fmt(totalAguaLechon, 2)} L</td>
+      <td>${fmt(totalMlLechon, 2)} mL</td>
+      <td>${fmtE(totalCosteLechon)}</td>
+      <td class="tfoot-alt">${fmtE2(totalCosteLote)}</td>
+    </tr>
+  `;
+}
+
+function bindSlider(id, outId, decimals, suffix, locale) {
+  const input = document.getElementById(id);
+  const out = document.getElementById(outId);
+  input.addEventListener('input', () => {
+    let v = parseFloat(input.value);
+    out.textContent = locale
+      ? v.toLocaleString('es-ES')
+      : v.toFixed(decimals).replace('.', ',');
+    calc();
+  });
+}
+
+bindSlider('dosis', 'dosis-val', 1, '', false);
+bindSlider('semanas', 'semanas-val', 0, '', false);
+bindSlider('precio', 'precio-val', 0, '', false);
+bindSlider('lechones', 'lechones-val', 0, '', true);
+
+calc();
+</script>
+</body>
+</html>
